@@ -2,7 +2,7 @@
 name: Build
 
 on: # yamllint disable-line rule:truthy
-  workflow_dispatch:
+  workflow_call:
 
 env:
   RUST_BACKTRACE: full
