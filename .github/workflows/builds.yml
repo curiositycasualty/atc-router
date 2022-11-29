@@ -1,0 +1,20 @@
+---
+name: Builds
+
+on: # yamllint disable-line rule:truthy
+  workflow_call:
+
+jobs:
+  artifacts:
+    name: Build Artifacts
+    uses: ./.github/workflows/build.yml
+    strategy:
+      matrix:
+        arch:
+          - x86_64
+          - aarch64
+        libc:
+          - gnu
+          - musl
+    with:
+      target: ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
