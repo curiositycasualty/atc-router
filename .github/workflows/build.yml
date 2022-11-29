@@ -1,0 +1,56 @@
+---
+name: Build
+
+on: # yamllint disable-line rule:truthy
+  pull_request:
+  push:
+    # branches:
+    #   - main
+
+env:
+  DESTDIR: /tmp/build
+  LUA_LIB_DIR: /usr/local/openresty/lualib
+  LUA_VERSION: '5.1'
+
+jobs:
+  artifacts:
+    name: Create Release Artifacts
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        arch: [aarch64, x86_64]
+        os: [linux-gnu, linux-musl]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Toolchains
+        run: |
+          # ensure that the luajit package is the version of Lua we expect
+          jit_package="$(
+            apt-cache search luajit \
+              | grep "version ${LUA_VERSION}" | cut -d' ' -f1
+          )"
+
+          if [ -z "$jit_package" ]; then
+            echo "::error ::No LuaJIT (${LUA_VERSION}) package available"
+          fi
+
+          # musl-dev includes aarch64
+          sudo apt-get install -y \
+            gcc-aarch64-linux-gnu \
+            binutils-aarch64-linux-gnu \
+            musl-dev
+
+      - name: Setup Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.arch }}-unknown-${{ matrix.os }}-gcc
+
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: |
+            --target ${{ matrix.arch }}-unknown-${{ matrix.os }}-gcc
