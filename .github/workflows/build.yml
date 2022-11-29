@@ -19,8 +19,11 @@ jobs:
 
     strategy:
       matrix:
-        arch: [aarch64, x86_64]
-        libc: [gnu, musl]
+        target:
+          - aarch64-unknown-linux-gnu-gcc
+          - aarch64-unknown-linux-musl-gcc
+          - x86_64-unknown-linux-gnu-gcc
+          - x86_64-unknown-linux-musl-gcc
 
     steps:
       - uses: actions/checkout@v3
@@ -46,14 +49,13 @@ jobs:
       - name: Setup Toolchain
         uses: actions-rs/toolchain@v1
         # skip setup on the default toolchain
-        if: ${{ (matrix.arch != 'x86_64') && (matrix.libc != 'gnu') }}
+        if: matrix.target != 'x86_64-unknown-linux-gnu-gcc'
         with:
-          target: ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}-gcc
           override: true
+          target: ${{ matrix.target }}
+          toolchain: stable
 
       - uses: actions-rs/cargo@v1
         with:
-          use-cross: true
+          args: --release --target ${{ matrix.target }}
           command: build
-          args: |
-            --target ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}-gcc
