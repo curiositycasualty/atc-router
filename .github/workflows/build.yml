@@ -28,7 +28,7 @@ jobs:
 
       - uses: actions-rs/toolchain@v1
         # skip setup on the default toolchain
-        if: ${{ (matrix.arch == 'x86_64') && (matrix.libc == 'gnu') }}
+        if: ${{ (matrix.arch != 'x86_64') && (matrix.libc != 'gnu') }}
         with:
           override: true
           target: ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
