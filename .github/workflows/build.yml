@@ -8,15 +8,12 @@ on: # yamllint disable-line rule:truthy
     #   - main
 
 env:
-  DESTDIR: /tmp/build
-  LUA_LIB_DIR: /usr/local/openresty/lualib
-  LUA_VERSION: '5.1'
+  RUST_BACKTRACE: full
 
 jobs:
   artifacts:
-    name: Create Release Artifacts
+    name: Build Artifacts
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         target:
@@ -27,25 +24,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install Toolchains
-        run: |
-          # ensure that the luajit package is the version of Lua we expect
-          jit_package="$(
-            apt-cache search luajit \
-              | grep "version ${LUA_VERSION}" | cut -d' ' -f1
-          )"
-
-          if [ -z "$jit_package" ]; then
-            echo "::error ::No LuaJIT (${LUA_VERSION}) package available"
-          fi
-
-          # # musl-dev includes aarch64
-          # sudo apt-get install -y \
-          #   gcc-aarch64-linux-gnu \
-          #   binutils-aarch64-linux-gnu \
-          #   musl-dev
-
       - name: Setup Toolchain
         uses: actions-rs/toolchain@v1
         # skip setup on the default toolchain
@@ -54,9 +32,8 @@ jobs:
           override: true
           target: ${{ matrix.target }}
           toolchain: stable
-
       - uses: actions-rs/cargo@v1
         with:
-          args: --release --target ${{ matrix.target }}
+          args: --release --target ${{ matrix.target }} --verbose
           command: build
           use-cross: true
