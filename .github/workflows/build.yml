@@ -40,11 +40,11 @@ jobs:
             echo "::error ::No LuaJIT (${LUA_VERSION}) package available"
           fi
 
-          # musl-dev includes aarch64
-          sudo apt-get install -y \
-            gcc-aarch64-linux-gnu \
-            binutils-aarch64-linux-gnu \
-            musl-dev
+          # # musl-dev includes aarch64
+          # sudo apt-get install -y \
+          #   gcc-aarch64-linux-gnu \
+          #   binutils-aarch64-linux-gnu \
+          #   musl-dev
 
       - name: Setup Toolchain
         uses: actions-rs/toolchain@v1
@@ -59,3 +59,4 @@ jobs:
         with:
           args: --release --target ${{ matrix.target }}
           command: build
+          use-cross: true
