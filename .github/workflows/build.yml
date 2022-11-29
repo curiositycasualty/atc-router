@@ -48,7 +48,6 @@ jobs:
         # skip setup on the default toolchain
         if: ${{ (matrix.arch != 'x86_64') && (matrix.libc != 'gnu') }}
         with:
-          toolchain: stable
           target: ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}-gcc
           override: true
 
