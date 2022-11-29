@@ -20,10 +20,11 @@ jobs:
     strategy:
       matrix:
         arch: [aarch64, x86_64]
-        os: [linux-gnu, linux-musl]
+        libc: [gnu, musl]
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Install Toolchains
         run: |
           # ensure that the luajit package is the version of Lua we expect
@@ -44,13 +45,15 @@ jobs:
 
       - name: Setup Toolchain
         uses: actions-rs/toolchain@v1
+        # skip setup on the default toolchain
+        if: ${{ (matrix.arch != 'x86_64') && (matrix.libc != 'gnu') }}
         with:
           toolchain: stable
-          target: ${{ matrix.arch }}-unknown-${{ matrix.os }}-gcc
+          target: ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}-gcc
 
       - uses: actions-rs/cargo@v1
         with:
           use-cross: true
           command: build
           args: |
-            --target ${{ matrix.arch }}-unknown-${{ matrix.os }}-gcc
+            --target ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}-gcc
