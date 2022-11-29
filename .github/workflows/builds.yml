@@ -1,11 +1,11 @@
 ---
-name: Builds
+name: Build Targets
 
 on: # yamllint disable-line rule:truthy
   workflow_call:
 
 jobs:
-  artifacts:
+  builds:
     name: Build Artifacts
     uses: ./.github/workflows/build.yml
     strategy:
