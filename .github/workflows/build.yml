@@ -24,6 +24,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Setup Toolchain
         uses: actions-rs/toolchain@v1
         # skip setup on the default toolchain
@@ -32,7 +33,10 @@ jobs:
           override: true
           target: ${{ matrix.target }}
           toolchain: stable
+
       - uses: actions-rs/cargo@v1
+        env:
+          RUSTFLAGS: -C target-feature=-crt-static
         with:
           args: --release --target ${{ matrix.target }} --verbose
           command: build
