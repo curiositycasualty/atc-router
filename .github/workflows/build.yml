@@ -50,6 +50,7 @@ jobs:
         with:
           toolchain: stable
           target: ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}-gcc
+          override: true
 
       - uses: actions-rs/cargo@v1
         with:
