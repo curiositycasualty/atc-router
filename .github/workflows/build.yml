@@ -35,7 +35,8 @@ jobs:
 
       - uses: actions-rs/cargo@v1
         env:
-          # quiet (allow) warnings and produce statically  linked library
+          # 1. quiet (aka allow) warnings; these were getting parsed by gha
+          # 2. produce statically  linked library
           RUSTFLAGS: -Awarnings -C target-feature=-crt-static
         with:
           args: --release --target ${{ matrix.target }} --verbose
