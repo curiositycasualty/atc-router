@@ -17,16 +17,15 @@ jobs:
     strategy:
       matrix:
         target:
-          - aarch64-unknown-linux-gnu
-          - aarch64-unknown-linux-musl
           - x86_64-unknown-linux-gnu
-          - x86_64-unknown-linux-musl
+          # - aarch64-unknown-linux-gnu
+          # - aarch64-unknown-linux-musl
+          # - x86_64-unknown-linux-musl
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Toolchain
-        uses: actions-rs/toolchain@v1
+      - uses: actions-rs/toolchain@v1
         # skip setup on the default toolchain
         if: matrix.target != 'x86_64-unknown-linux-gnu-gcc'
         with:
@@ -42,8 +41,10 @@ jobs:
           command: build
           use-cross: true
 
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v3
+      - run: |
+          find .
+
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.target }}
           path: target/${{ matrix.target }}/libatc_router.a
