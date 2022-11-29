@@ -20,10 +20,10 @@ jobs:
     strategy:
       matrix:
         target:
-          - aarch64-unknown-linux-gnu-gcc
-          - aarch64-unknown-linux-musl-gcc
-          - x86_64-unknown-linux-gnu-gcc
-          - x86_64-unknown-linux-musl-gcc
+          - aarch64-unknown-linux-gnu
+          - aarch64-unknown-linux-musl
+          - x86_64-unknown-linux-gnu
+          - x86_64-unknown-linux-musl
 
     steps:
       - uses: actions/checkout@v3
