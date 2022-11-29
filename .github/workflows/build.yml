@@ -2,14 +2,6 @@
 name: Build Target
 
 on: # yamllint disable-line rule:truthy
-  workflow_call:
-    inputs:
-      target:
-        required: true
-        type: string
-      release:
-        default: false
-        type: boolean
   workflow_dispatch:
     inputs:
       target:
@@ -20,6 +12,21 @@ on: # yamllint disable-line rule:truthy
         default: false
         description: 'run cargo with --release flag (default: false)'
         type: boolean
+      upload:
+        default: true
+        description: 'upload created .a & .so files (default: true)'
+        type: boolean
+  workflow_call:
+    inputs:
+      target:
+        required: true
+        type: string
+      release:
+        default: false
+        type: boolean
+      upload:
+        default: true
+        type: boolean
 
 env:
   RUST_BACKTRACE: full
@@ -28,6 +35,8 @@ jobs:
   build:
     name: 'Build Target: ${{ inputs.target }}'
     runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.flags.outputs.release }}
     steps:
       - uses: actions/checkout@v3
 
@@ -39,21 +48,20 @@ jobs:
           target: ${{ inputs.target }}
           toolchain: stable
 
-      - uses: actions-rs/cargo@v1
-        if: fromJSON(inputs.release) == true
-        env:
-          RUSTFLAGS: -C target-feature=-crt-static
-        with:
-          args: --release --verbose --target ${{ inputs.target }}
-          command: build
-          use-cross: true
+      - name: Determine Cargo "release" Flag
+        id: flags
+        run: |
+          if [[ '${{ inputs.release }}' == 'true' ]]; then
+            echo 'release=--release' >> $GITHUB_OUTPUT
+          else
+            echo 'release=' >> $GITHUB_OUTPUT
+          fi
 
       - uses: actions-rs/cargo@v1
-        if: fromJSON(inputs.release) == false
         env:
           RUSTFLAGS: -C target-feature=-crt-static
         with:
-          args: --verbose --target ${{ inputs.target }}
+          args: ${{outputs.needs.flags}} --verbose --target ${{ inputs.target }}
           command: build
           use-cross: true
 
