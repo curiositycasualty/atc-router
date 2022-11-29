@@ -47,5 +47,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.target }}
-          path: target/${{ matrix.target }}/libatc_router.a
+          path: |
+            target/${{matrix.target}}/release/libatc_router.a
+            target/${{matrix.target}}/release/libatc_router.so
           retention-days: 5
