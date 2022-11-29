@@ -13,10 +13,11 @@ jobs:
         run: cargo clippy --verbose
 
   build:
-    name: Run Build Workflow
+    name: 'Run Build Workflow: x86_64-unknown-linux-gnu'
     uses: ./.github/workflows/build.yml
     with:
       target: x86_64-unknown-linux-gnu
+      release: false
 
   tests:
     name: Tests

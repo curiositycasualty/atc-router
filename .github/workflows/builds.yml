@@ -6,7 +6,7 @@ on: # yamllint disable-line rule:truthy
 
 jobs:
   builds:
-    name: Build Artifacts
+    name: Build targets
     uses: ./.github/workflows/build.yml
     strategy:
       matrix:
