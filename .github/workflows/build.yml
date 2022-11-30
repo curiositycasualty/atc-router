@@ -61,7 +61,7 @@ jobs:
         env:
           RUSTFLAGS: -C target-feature=-crt-static
         with:
-          args: ${{outputs.needs.flags}} --verbose --target ${{ inputs.target }}
+          args: ${{ steps.flags.outputs.release }} --verbose --target ${{ inputs.target }}
           command: build
           use-cross: true
 
