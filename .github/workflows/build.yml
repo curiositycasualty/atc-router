@@ -65,17 +65,10 @@ jobs:
           command: build
           use-cross: true
 
-      - name: Determine Cargo "release" Flag
+      - name: Relocate Binary Files
         run: |
           mkdir -pv /tmp/upload
-          for path in \
-            target/*/release/libatc_router.a \
-            target/*/release/libatc_router.so \
-            target/*/debug/libatc_router.a \
-            target/*/debug/libatc_router.so \
-          ; do
-            cp -v "$path" /tmp/upload
-          done
+          cp -v target/*/*/libatc_router.{a,so} /tmp/upload/
 
       - uses: actions/upload-artifact@v3
         if: inputs.upload
