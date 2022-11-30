@@ -17,6 +17,7 @@ jobs:
     with:
       target: x86_64-unknown-linux-gnu
       release: false
+      upload: false
 
   tests:
     name: Tests

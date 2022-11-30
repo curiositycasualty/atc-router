@@ -66,10 +66,11 @@ jobs:
           use-cross: true
 
       - uses: actions/upload-artifact@v3
+        if: inputs.upload
         with:
           name: ${{ inputs.target }}
           path: |
-            target/*/release/libatc_router.a
-            target/*/release/libatc_router.so
+            target/*/{debug,release}/libatc_router.a
+            target/*/{debug,release}/libatc_router.so
           retention-days: 5
           if-no-files-found: error
