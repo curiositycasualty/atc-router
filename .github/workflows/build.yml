@@ -37,27 +37,18 @@ jobs:
     name: 'Build Target: ${{ inputs.target }}'
     runs-on: ubuntu-latest
     outputs:
-      release: ${{ steps.flags.outputs.release }}
-      cross: ${{ steps.flags.outputs.cross }}
-      default: ${{ steps.toolchain.outputs.default }}
+      release: steps.flags.outputs.release
+      cross: fromJSON(steps.flags.outputs.cross)
+      default: steps.toolchain.outputs.default
     steps:
       - uses: actions/checkout@v3
-
-      - uses: actions-rs/toolchain@v1
-        # skip setup on the default toolchain
-        if: inputs.target != 'x86_64-unknown-linux-gnu'
-        with:
-          override: true
-          target: ${{ inputs.target }}
-          toolchain: stable
 
       - name: Determine Default Toolchain
         id: toolchain
         run: |
-          default_toolchain="$(
-            rustup toolchain list | cut -d' ' -f1
-          )"
-          echo "default=${default_toolchain}" >> $GITHUB_OUTPUT
+          default="$(rustup toolchain list | cut -d' ' -f1)"
+          echo "default=${default}" >> $GITHUB_OUTPUT
+          echo "::notice ::Default toolchain is: ${default}"
 
       - name: Determine Cargo Flags
         id: flags
@@ -70,9 +61,19 @@ jobs:
 
           if [[ '${{ inputs.target }}' == '${{ steps.toolchain.outputs.default }}' ]]; then
             echo 'cross=false' >> $GITHUB_OUTPUT
+            echo "::notice ::Cross-compiling disabled."
           else
             echo 'cross=true' >> $GITHUB_OUTPUT
+            echo "::notice ::Cross-compiling enabled."
           fi
+
+      - uses: actions-rs/toolchain@v1
+        # skip setup on the default toolchain
+        if: inputs.target != 'x86_64-unknown-linux-gnu'
+        with:
+          override: true
+          target: ${{ inputs.target }}
+          toolchain: stable
 
       - uses: actions-rs/cargo@v1
         if: inputs.target != steps.toolchain.outputs.default
