@@ -84,15 +84,17 @@ jobs:
           command: build
           use-cross: ${{ steps.flags.outputs.cross }}
 
-      - name: Relocate Binary Files
+      - name: Relocate Files
         run: |
-          mkdir -pv /tmp/upload
-          cp -v target/*/*/libatc_router.{a,so} /tmp/upload/
+          mkdir -pv target/release/
+          cp -v \
+            target/*/${{ inputs.target }}/libatc_router.{a,so} \
+            target/release/
+          rm -rfv target/*/${{ inputs.target }}
 
       - uses: actions/upload-artifact@v3
         if: inputs.upload
         with:
           name: ${{ inputs.target }}
-          path: /tmp/upload
           retention-days: 5
           if-no-files-found: error
