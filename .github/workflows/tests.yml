@@ -9,11 +9,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - name: Run lint
-        run: cargo clippy --verbose
+      - uses: actions-rs/clippy-check@v1
 
   build:
-    name: 'Run Build Workflow: x86_64-unknown-linux-gnu'
+    name: Run Build Workflow
     uses: ./.github/workflows/build.yml
     with:
       target: x86_64-unknown-linux-gnu
