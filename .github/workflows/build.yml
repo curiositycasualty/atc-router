@@ -94,11 +94,11 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         if: inputs.upload
-        path: |
-          Makefile
-          target
-          lib/resty/router
         with:
           name: ${{ inputs.target }}
           retention-days: 5
           if-no-files-found: error
+          path: |
+            Makefile
+            target
+            lib/resty/router
