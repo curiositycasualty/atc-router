@@ -46,7 +46,10 @@ jobs:
       - name: Determine Default Toolchain
         id: toolchain
         run: |
-          default="$(rustup toolchain list | cut -d' ' -f1)"
+          default="$(
+            # "stable-x86_64-apple-darwin" -> "x86_64-apple-darwin"
+            rustup toolchain list | cut -d' ' -f1 | cut -d'-' -f2-
+          )"
           echo "default=${default}" >> $GITHUB_OUTPUT
           echo "::notice ::Default toolchain is: ${default}"
 
@@ -80,7 +83,7 @@ jobs:
         with:
           args: ${{ steps.flags.outputs.release }} --verbose --target ${{ inputs.target }}
           command: build
-          use-cross: ${{ fromJSON(steps.flags.outputs.cross) }}
+          use-cross: ${{ steps.flags.outputs.cross }}
 
       - name: Relocate Binary Files
         run: |
