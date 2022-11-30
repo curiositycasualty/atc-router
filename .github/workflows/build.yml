@@ -86,7 +86,8 @@ jobs:
 
       - name: Relocate Files
         run: |
-          mkdir -pv target/release/
+          rm -rf target/release
+          mkdir -pv target/release
           cp -v \
             target/${{ inputs.target }}/*/libatc_router.{a,so} \
             target/release/
