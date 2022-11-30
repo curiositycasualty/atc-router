@@ -88,9 +88,9 @@ jobs:
         run: |
           mkdir -pv target/release/
           cp -v \
-            target/*/${{ inputs.target }}/libatc_router.{a,so} \
+            target/${{ inputs.target }}/*/libatc_router.{a,so} \
             target/release/
-          rm -rfv target/*/${{ inputs.target }}
+          rm -rfv target/${{ inputs.target }}
 
       - uses: actions/upload-artifact@v3
         if: inputs.upload
