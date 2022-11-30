@@ -30,6 +30,7 @@ on: # yamllint disable-line rule:truthy
 
 env:
   RUST_BACKTRACE: full
+  RUSTFLAGS: -C target-feature=-crt-static
 
 jobs:
   build:
@@ -37,6 +38,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release: ${{ steps.flags.outputs.release }}
+      cross: ${{ steps.flags.outputs.cross }}
+      default: ${{ steps.toolchain.outputs.default }}
     steps:
       - uses: actions/checkout@v3
 
@@ -48,7 +51,15 @@ jobs:
           target: ${{ inputs.target }}
           toolchain: stable
 
-      - name: Determine Cargo "release" Flag
+      - name: Determine Default Toolchain
+        id: toolchain
+        run: |
+          default_toolchain="$(
+            rustup toolchain list | cut -d' ' -f1
+          )"
+          echo "default=${default_toolchain}" >> $GITHUB_OUTPUT
+
+      - name: Determine Cargo Flags
         id: flags
         run: |
           if [[ '${{ inputs.release }}' == 'true' ]]; then
@@ -57,13 +68,18 @@ jobs:
             echo 'release=' >> $GITHUB_OUTPUT
           fi
 
+          if [[ '${{ inputs.target }}' == '${{ steps.toolchain.outputs.default }}' ]]; then
+            echo 'cross=false' >> $GITHUB_OUTPUT
+          else
+            echo 'cross=true' >> $GITHUB_OUTPUT
+          fi
+
       - uses: actions-rs/cargo@v1
-        env:
-          RUSTFLAGS: -C target-feature=-crt-static
+        if: inputs.target != steps.toolchain.outputs.default
         with:
           args: ${{ steps.flags.outputs.release }} --verbose --target ${{ inputs.target }}
           command: build
-          use-cross: true
+          use-cross: ${{ fromJSON(steps.flags.outputs.cross) }}
 
       - name: Relocate Binary Files
         run: |
