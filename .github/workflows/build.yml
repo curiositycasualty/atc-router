@@ -72,7 +72,7 @@ jobs:
 
       - uses: actions-rs/toolchain@v1
         # skip setup on the default toolchain
-        if: steps.flags.outputs.cross
+        if: ${{ steps.flags.outputs.cross }}
         with:
           override: true
           target: ${{ inputs.target }}
