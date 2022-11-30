@@ -72,14 +72,13 @@ jobs:
 
       - uses: actions-rs/toolchain@v1
         # skip setup on the default toolchain
-        if: inputs.target != 'x86_64-unknown-linux-gnu'
+        if: steps.flags.outputs.cross
         with:
           override: true
           target: ${{ inputs.target }}
           toolchain: stable
 
       - uses: actions-rs/cargo@v1
-        if: inputs.target != steps.toolchain.outputs.default
         with:
           args: ${{ steps.flags.outputs.release }} --verbose --target ${{ inputs.target }}
           command: build
