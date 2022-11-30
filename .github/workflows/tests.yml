@@ -20,7 +20,7 @@ jobs:
     with:
       target: x86_64-unknown-linux-gnu
       release: false
-      upload: false
+      upload: true
 
   tests:
     name: Tests
@@ -68,9 +68,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # - uses: actions/download-artifact@v3
-      #   with:
-      #     name: x86_64-unknown-linux-gnu
+      - uses: actions/download-artifact@v3
+        with:
+          name: x86_64-unknown-linux-gnu
 
       - name: Setup Nginx binary cache
         uses: actions/cache@v2
