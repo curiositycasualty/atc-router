@@ -65,14 +65,23 @@ jobs:
           command: build
           use-cross: true
 
+      - name: Determine Cargo "release" Flag
+        id: flags
+        run: |
+          mkdir -pv /tmp/upload
+          for path in \
+            target/*/release/libatc_router.a \
+            target/*/release/libatc_router.so \
+            target/*/debug/libatc_router.a \
+            target/*/debug/libatc_router.so \
+          ; do
+            cp -v "$path" /tmp/upload
+          done
+
       - uses: actions/upload-artifact@v3
         if: inputs.upload
         with:
           name: ${{ inputs.target }}
-          path: |
-            target/*/release/libatc_router.a
-            target/*/release/libatc_router.so
-            target/*/debug/libatc_router.a
-            target/*/debug/libatc_router.so
+          path: /tmp/upload
           retention-days: 5
           if-no-files-found: error
