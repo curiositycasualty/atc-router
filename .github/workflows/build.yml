@@ -70,7 +70,9 @@ jobs:
         with:
           name: ${{ inputs.target }}
           path: |
-            target/*/{debug,release}/libatc_router.a
-            target/*/{debug,release}/libatc_router.so
+            target/*/release/libatc_router.a
+            target/*/release/libatc_router.so
+            target/*/debug/libatc_router.a
+            target/*/debug/libatc_router.so
           retention-days: 5
           if-no-files-found: error
