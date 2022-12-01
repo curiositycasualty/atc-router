@@ -2,7 +2,17 @@
 name: Build Targets
 
 on: # yamllint disable-line rule:truthy
+  workflow_dispatch:
+    inputs:
+      upload:
+        default: true
+        description: 'upload created .a & .so files (default: true)'
+        type: boolean
   workflow_call:
+    inputs:
+      upload:
+        default: true
+        type: boolean
 
 jobs:
   builds:
@@ -18,3 +28,4 @@ jobs:
           - musl
     with:
       target: ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
+      upload: ${{ inputs.upload }}
