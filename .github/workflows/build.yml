@@ -93,7 +93,7 @@ jobs:
               target/${{ inputs.target }}/"$type"/libatc_router.{a,so} \
               "target/${type}/" || true
           done
-          rm -rfv target/${{ inputs.target }}
+          rm -rf target/${{ inputs.target }}
 
       - uses: actions/upload-artifact@v3
         if: inputs.upload
