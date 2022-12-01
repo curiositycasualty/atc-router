@@ -9,8 +9,8 @@ on: # yamllint disable-line rule:truthy
         description: target to build for (e.g. "x86_64-unknown-linux-gnu")
         type: string
       release:
-        default: false
-        description: 'run cargo with --release flag (default: false)'
+        default: true
+        description: 'run cargo with --release flag (default: true)'
         type: boolean
       upload:
         default: true
@@ -22,7 +22,7 @@ on: # yamllint disable-line rule:truthy
         required: true
         type: string
       release:
-        default: false
+        default: true
         type: boolean
       upload:
         default: true
@@ -58,8 +58,10 @@ jobs:
         run: |
           if [[ '${{ inputs.release }}' == 'true' ]]; then
             echo 'release=--release' >> $GITHUB_OUTPUT
+            echo "::notice ::Building cargo release artifact."
           else
             echo 'release=' >> $GITHUB_OUTPUT
+            echo "::notice ::Building cargo debug artifact."
           fi
 
           if [[ '${{ inputs.target }}' == '${{ steps.toolchain.outputs.default }}' ]]; then
