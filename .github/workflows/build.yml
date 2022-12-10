@@ -1,0 +1,110 @@
+---
+name: Build Target
+
+on: # yamllint disable-line rule:truthy
+  workflow_dispatch:
+    inputs:
+      target:
+        default: x86_64-unknown-linux-gnu
+        description: target to build for (e.g. "x86_64-unknown-linux-gnu")
+        type: string
+      release:
+        default: true
+        description: 'run cargo with --release flag (default: true)'
+        type: boolean
+      upload:
+        default: true
+        description: 'upload created .a & .so files (default: true)'
+        type: boolean
+  workflow_call:
+    inputs:
+      target:
+        required: true
+        type: string
+      release:
+        default: true
+        type: boolean
+      upload:
+        default: true
+        type: boolean
+
+env:
+  RUST_BACKTRACE: full
+  RUSTFLAGS: -C target-feature=-crt-static
+
+jobs:
+  build:
+    name: 'Build Target: ${{ inputs.target }}'
+    runs-on: ubuntu-latest
+    container: quay.io/pypa/manylinux2014_x86_64
+    outputs:
+      release: steps.flags.outputs.release
+      cross: fromJSON(steps.flags.outputs.cross)
+      default: steps.toolchain.outputs.default
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Determine Default Toolchain
+        id: toolchain
+        run: |
+          default="$(
+            # "stable-x86_64-apple-darwin" -> "x86_64-apple-darwin"
+            rustup toolchain list | cut -d' ' -f1 | cut -d'-' -f2-
+          )"
+          echo "default=${default}" >> $GITHUB_OUTPUT
+          echo "::notice ::Default toolchain is: ${default}"
+
+      - name: Determine Cargo Flags
+        id: flags
+        run: |
+          if [[ '${{ inputs.release }}' == 'true' ]]; then
+            echo 'release=--release' >> $GITHUB_OUTPUT
+            echo "::notice ::Building cargo release artifact."
+          else
+            echo 'release=' >> $GITHUB_OUTPUT
+            echo "::notice ::Building cargo debug artifact."
+          fi
+
+          if [[ '${{ inputs.target }}' == '${{ steps.toolchain.outputs.default }}' ]]; then
+            echo 'cross=false' >> $GITHUB_OUTPUT
+            echo "::notice ::Cross-compiling disabled."
+          else
+            echo 'cross=true' >> $GITHUB_OUTPUT
+            echo "::notice ::Cross-compiling enabled."
+          fi
+
+      - uses: actions-rs/toolchain@v1
+        # skip setup on the default toolchain
+        if: ${{ fromJSON(steps.flags.outputs.cross) }}
+        with:
+          override: true
+          target: ${{ inputs.target }}
+          toolchain: stable
+
+      - uses: actions-rs/cargo@v1
+        with:
+          args: ${{ steps.flags.outputs.release }} --verbose --target ${{ inputs.target }}
+          command: build
+          use-cross: ${{ steps.flags.outputs.cross }}
+
+      - name: Relocate Files
+        run: |
+          rm -rf target/{debug,release}
+          mkdir -pv target/{debug,release}
+          for type in release debug; do
+            cp -v \
+              target/${{ inputs.target }}/"$type"/libatc_router.{a,so} \
+              "target/${type}/" || true
+          done
+          rm -rf target/${{ inputs.target }}
+
+      - uses: actions/upload-artifact@v3
+        if: inputs.upload
+        with:
+          name: ${{ inputs.target }}
+          retention-days: 5
+          if-no-files-found: error
+          path: |
+            Makefile
+            target
+            lib/resty/router

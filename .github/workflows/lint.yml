@@ -1,10 +1,11 @@
-name: Lint
+---
+name: Lint Lua Code
 
 on: [push, pull_request]
 
 jobs:
   tests:
-    name: Lint
+    name: Lint Lua Code
     runs-on: ubuntu-20.04
 
     steps:
