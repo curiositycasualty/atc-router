@@ -1,5 +1,7 @@
 OS=$(shell uname -s)
 
+.SHELLFLAGS+=-x
+
 ifeq ($(OS), Darwin)
 SHLIB_EXT=dylib
 else
