@@ -36,7 +36,6 @@ jobs:
   build:
     name: 'Build Target: ${{ inputs.target }}'
     runs-on: ubuntu-latest
-    container: quay.io/pypa/manylinux2014_x86_64
     outputs:
       release: steps.flags.outputs.release
       cross: fromJSON(steps.flags.outputs.cross)
